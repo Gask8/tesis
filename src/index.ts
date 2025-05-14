@@ -1,5 +1,9 @@
 // src/index.ts
-import express, { Express, Request, Response } from 'express';
+import express, { Express, Request, Response } from "express";
+import dotenv from "dotenv";
+import carRoutes from "./routes/car.routes";
+
+dotenv.config();
 
 const app: Express = express();
 const port = 3000;
@@ -8,14 +12,13 @@ const port = 3000;
 app.use(express.json());
 
 // Basic route
-app.get('/', (req: Request, res: Response) => {
-  res.json({ message: 'Hello from TypeScript Express!' });
+app.get("/", (req: Request, res: Response) => {
+  res.json({ message: "Hello from TypeScript Express!" });
 });
 
 // Example route with parameters
-app.get('/users/:id', (req: Request, res: Response) => {
-  res.json({ userId: req.params.id });
-});
+// Routes
+app.use("/api/cars", carRoutes);
 
 // Start server
 app.listen(port, () => {

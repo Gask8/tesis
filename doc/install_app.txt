@@ -1,0 +1,20 @@
+# For App EC2
+sudo yum update -y
+
+## Git
+sudo yum install git -y
+#== Instalar SSH para Github
+ssh-keygen -t ed25519 -C "gabsalk@amazon.com"
+cat ~/.ssh/id_ed25519.pub
+
+## Postgres
+# https://hbayraktar.medium.com/how-to-install-postgresql-15-on-amazon-linux-2023-a-step-by-step-guide-57eebb7ad9fc
+sudo yum install postgresql17 -y
+#== test connection
+psql -h database-1.c5wm0qy68wtt.us-east-1.rds.amazonaws.com -U postgres -d postgres
+
+## Node
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+source ~/.bashrc
+nvm install --lts
+node -e "console.log('Running Node.js ' + process.version)"
