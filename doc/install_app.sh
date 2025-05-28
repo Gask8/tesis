@@ -51,6 +51,8 @@ pm2 start dist/index.js --name "my-app"
 pm2 startup
 pm2 save
 
+## DOCKER
+
 
 #POWERTOP
 sudo apt-get install powertop

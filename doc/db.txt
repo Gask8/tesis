@@ -1,3 +1,4 @@
+psql -h database-1.c5wm0qy68wtt.us-east-1.rds.amazonaws.com -U postgres -d postgres
 
 # database
 CREATE TABLE cars (

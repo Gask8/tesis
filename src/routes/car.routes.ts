@@ -16,7 +16,7 @@ router.get("/", async (req: Request, res: Response) => {
 });
 
 // Get car by ID
-router.get("/:id", async (req: Request, res: Response): Promise<any> => {
+router.get("/id/:id", async (req: Request, res: Response): Promise<any> => {
   try {
     const car = await CarModel.findById(parseInt(req.params.id));
     if (!car) {
@@ -41,7 +41,7 @@ router.post("/", async (req: Request, res: Response) => {
 });
 
 // Update car
-router.put("/:id", async (req: Request, res: Response): Promise<any> => {
+router.put("/id/:id", async (req: Request, res: Response): Promise<any> => {
   try {
     const updatedCar = await CarModel.update(parseInt(req.params.id), req.body);
     if (!updatedCar) {
@@ -55,7 +55,7 @@ router.put("/:id", async (req: Request, res: Response): Promise<any> => {
 });
 
 // Delete car
-router.delete("/:id", async (req: Request, res: Response): Promise<any> => {
+router.delete("/id/:id", async (req: Request, res: Response): Promise<any> => {
   try {
     const deleted = await CarModel.delete(parseInt(req.params.id));
     if (!deleted) {
