@@ -25,11 +25,11 @@ describe("Car Routes", () => {
   });
 
   // Test GET all cars
-  describe("GET /api/cars", () => {
+  describe("GET /api/cars/all", () => {
     it("should get all cars", async () => {
       (CarModel.findAll as jest.Mock).mockResolvedValue([mockCar]);
 
-      const res = await request(app).get("/api/cars");
+      const res = await request(app).get("/api/cars/all");
       expect(res.status).toBe(200);
       expect(res.body).toEqual([mockCar]);
     });
@@ -39,7 +39,7 @@ describe("Car Routes", () => {
         new Error("Database error")
       );
 
-      const res = await request(app).get("/api/cars");
+      const res = await request(app).get("/api/cars/all");
       expect(res.status).toBe(500);
       expect(res.body).toEqual({ message: "Internal server error" });
     });

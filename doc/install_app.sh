@@ -52,6 +52,21 @@ pm2 startup
 pm2 save
 
 ## DOCKER
+sudo apt-get update
+sudo apt-get install apt-transport-https ca-certificates curl software-properties-common -y
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+sudo apt-get update
+sudo apt-get install docker-ce docker-ce-cli containerd.io -y
+
+sudo systemctl start docker
+sudo systemctl enable docker
+
+sudo usermod -a -G docker ubuntu
+newgrp docker
+docker --version
+
+# docker build -t my-app .
+# docker run -p 3000:3000 my-app
 
 
 #POWERTOP

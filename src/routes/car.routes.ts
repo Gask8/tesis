@@ -5,7 +5,7 @@ import { Car } from "../interfaces/car.interface";
 const router = Router();
 
 // Get all cars
-router.get("/", async (req: Request, res: Response) => {
+router.get("/all", async (req: Request, res: Response) => {
   try {
     const cars = await CarModel.findAll();
     res.json(cars);
