@@ -67,6 +67,9 @@ Resources:
           FromPort: 80
           ToPort: 80
           SourceSecurityGroupId: !Ref ALBSecurityGroup
+      Tags:
+        - Key: Name
+          Value: SG-APP
 
   # EC2 Instance
   EC2Instance:
@@ -82,55 +85,69 @@ Resources:
         - Fn::ImportValue: !Sub ${VPCStackName}::SGDBAccess
       Tags:
         - Key: Name
-          Value: app
+          Value: prod-app
         - Key: CPU
           Value: INTEL
         - Key: TYPE
           Value: COMPUTE
         - Key: auto-delete
           Value: no
-      # UserData:
-      #   Fn::Base64: !Sub |
-      #     #!/bin/bash
-      #     sudo apt update -y
-      #     sudo apt install git -y
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          apt update -y
+          apt install git -y
 
-      #     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
-      #     . "$HOME/.nvm/nvm.sh"
-      #     nvm install 22
-      #     node -v
-      #     npm -v
+          # Create ubuntu user if it doesn't exist and set up environment
+          useradd -m -s /bin/bash ubuntu || true
 
-      #     sudo apt install nginx -y
-      #     sudo systemctl start nginx
-      #     sudo systemctl enable nginx
+          # Execute commands as ubuntu user
+          su - ubuntu << 'EOF'
+          # NVM installation and Node setup
+          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+          export NVM_DIR="$HOME/.nvm"
+          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+          nvm install 22
+          node -v
+          npm -v
+          EOF
 
-      #     cat << EOF > /etc/nginx/sites-available/redirect
-      #     server {
-      #         listen 80;
-      #         server_name your_domain.com;  # Replace with your domain or IP
+          # Continue with system-level installations
+          apt install nginx -y
+          systemctl start nginx
+          systemctl enable nginx
 
-      #         location / {
-      #             proxy_pass http://localhost:3000;
-      #             proxy_http_version 1.1;
-      #             proxy_set_header Upgrade \$http_upgrade;
-      #             proxy_set_header Connection 'upgrade';
-      #             proxy_set_header Host \$host;
-      #             proxy_cache_bypass \$http_upgrade;
-      #         }
-      #     }
-      #     EOF
+          # Create nginx configuration
+          cat << 'EOF' > /etc/nginx/sites-available/redirect
+          server {
+              listen 80;
+              server_name your_domain.com;  # Replace with your domain or IP
 
-      #     sudo ln -s /etc/nginx/sites-available/redirect /etc/nginx/sites-enabled/
-      #     mv /etc/nginx/sites-enabled/default /etc/nginx/sites-enabled/.default
-      #     sudo nginx -t
-      #     sudo systemctl reload nginx
+              location / {
+                  proxy_pass http://localhost:3000;
+                  proxy_http_version 1.1;
+                  proxy_set_header Upgrade $http_upgrade;
+                  proxy_set_header Connection 'upgrade';
+                  proxy_set_header Host $host;
+                  proxy_cache_bypass $http_upgrade;
+              }
+          }
+          EOF
 
-      #     cd
-      #     git clone git@github.com:gabsalk8/tesis.git
-      #     cd tesis
-      #     npm install
-      #     ./scripts/startweb.sh
+          ln -s /etc/nginx/sites-available/redirect /etc/nginx/sites-enabled/
+          mv /etc/nginx/sites-enabled/default /etc/nginx/sites-enabled/.default
+          nginx -t
+          systemctl reload nginx
+
+          # Clone and set up application as ubuntu user
+          su - ubuntu << 'EOF'
+          cd $HOME
+          git clone https://github.com/gabsalk8/tesis.git
+          cd tesis
+          npm install
+          npm install -g pm2
+          ./scripts/startweb.sh
+          EOF
 
   # ALB Security Group
   ALBSecurityGroup:
@@ -144,6 +161,9 @@ Resources:
           FromPort: 80
           ToPort: 80
           CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: SG-LB
 
   # Application Load Balancer
   ApplicationLoadBalancer:
