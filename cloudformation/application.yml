@@ -61,7 +61,7 @@ Resources:
     Properties:
       GroupDescription: Allow traffic from ALB
       VpcId:
-        Fn::ImportValue: !Sub ${VPCStackName}::VpcId"
+        Fn::ImportValue: !Sub ${VPCStackName}::VpcId
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 80
@@ -76,10 +76,10 @@ Resources:
       ImageId: ami-0c7217cdde317cfec # Ubuntu 22.04 LTS in us-east-1, update as needed
       IamInstanceProfile: !Ref EC2InstanceProfile
       SubnetId:
-        Fn::ImportValue: !Sub ${VPCStackName}::PrivateSubnet1"
+        Fn::ImportValue: !Sub ${VPCStackName}::PrivateSubnet1
       SecurityGroupIds:
         - !Ref InstanceSecurityGroup
-        - Fn::ImportValue: !Sub ${VPCStackName}::SGDBAccess"
+        - Fn::ImportValue: !Sub ${VPCStackName}::SGDBAccess
       Tags:
         - Key: Name
           Value: app
@@ -138,7 +138,7 @@ Resources:
     Properties:
       GroupDescription: Allow HTTP traffic
       VpcId:
-        Fn::ImportValue: !Sub ${VPCStackName}::VpcId"
+        Fn::ImportValue: !Sub ${VPCStackName}::VpcId
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 80
@@ -153,8 +153,8 @@ Resources:
       SecurityGroups:
         - !Ref ALBSecurityGroup
       Subnets:
-        - Fn::ImportValue: !Sub ${VPCStackName}::PublicSubnet1"
-        - Fn::ImportValue: !Sub ${VPCStackName}::PublicSubnet2"
+        - Fn::ImportValue: !Sub ${VPCStackName}::PublicSubnet1
+        - Fn::ImportValue: !Sub ${VPCStackName}::PublicSubnet2
       Tags:
         - Key: TYPE
           Value: VPC
@@ -184,7 +184,7 @@ Resources:
       Targets:
         - Id: !Ref EC2Instance
       VpcId:
-        Fn::ImportValue: !Sub ${VPCStackName}::VpcId"
+        Fn::ImportValue: !Sub ${VPCStackName}::VpcId
 
 Outputs:
   LoadBalancerDNS:
