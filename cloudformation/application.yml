@@ -80,6 +80,15 @@ Resources:
       SecurityGroupIds:
         - !Ref InstanceSecurityGroup
         - Fn::ImportValue: !Sub ${VPCStackName}::SGDBAccess"
+      Tags:
+        - Key: Name
+          Value: app
+        - Key: CPU
+          Value: INTEL
+        - Key: TYPE
+          Value: COMPUTE
+        - Key: auto-delete
+          Value: no
       # UserData:
       #   Fn::Base64: !Sub |
       #     #!/bin/bash
@@ -146,6 +155,11 @@ Resources:
       Subnets:
         - Fn::ImportValue: !Sub ${VPCStackName}::PublicSubnet1"
         - Fn::ImportValue: !Sub ${VPCStackName}::PublicSubnet2"
+      Tags:
+        - Key: TYPE
+          Value: VPC
+        - Key: auto-delete
+          Value: no
 
   # ALB Listener
   ALBListener:
