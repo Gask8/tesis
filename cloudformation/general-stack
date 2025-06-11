@@ -1,6 +1,20 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: "VPC and DB"
 
+Parameters:
+  DBPassword:
+    Type: String
+    Description: Database admin password
+    NoEcho: true
+
+  DBInstanceClass:
+    Type: String
+    Default: db.m6i.large
+    AllowedValues:
+      - db.m6g.large
+      - db.m6i.large
+    Description: Database instance class
+
 Resources:
   # VPC
   VPC:
@@ -165,121 +179,97 @@ Resources:
         - Key: TYPE
           Value: VPC
 
-  # # DB Subnet Group
-  # DBSubnetGroup:
-  #   Type: AWS::RDS::DBSubnetGroup
-  #   DeletionPolicy: Retain
-  #   Properties:
-  #     DBSubnetGroupDescription: Subnet group for RDS
-  #     SubnetIds:
-  #       - Fn::ImportValue: !Sub ${VPCStackName}::PrivateSubnet1
-  #       - Fn::ImportValue: !Sub ${VPCStackName}::PrivateSubnet2
-  #     Tags:
-  #       - Key: Name
-  #         Value: !Sub ${Environment}-DB-Subnet-Group
-  #       - Key: Environment
-  #         Value: !Ref Environment
-  #       - Key: Group
-  #         Value: RDS
+  # DB Subnet Group
+  DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    DeletionPolicy: Retain
+    Properties:
+      DBSubnetGroupDescription: Subnet group for RDS
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+      Tags:
+        - Key: TYPE
+          Value: DB
 
-  # # Security Group for DB Access
-  # SGDBAccess:
-  #   Type: AWS::EC2::SecurityGroup
-  #   DeletionPolicy: Retain
-  #   Properties:
-  #     GroupDescription: Security group for DB access
-  #     VpcId:
-  #       Fn::ImportValue: !Sub ${VPCStackName}::VpcId
-  #     Tags:
-  #       - Key: Name
-  #         Value: !Sub ${Environment}-SG-DB-Access
-  #       - Key: Environment
-  #         Value: !Ref Environment
-  #       - Key: Group
-  #         Value: RDS
+  # Security Group for DB Access
+  SGDBAccess:
+    Type: AWS::EC2::SecurityGroup
+    DeletionPolicy: Retain
+    Properties:
+      GroupDescription: Security group for DB access
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: SG-DB-Access
+        - Key: TYPE
+          Value: DB
 
-  # # Security Group for RDS
-  # SGDB:
-  #   Type: AWS::EC2::SecurityGroup
-  #   DeletionPolicy: Retain
-  #   Properties:
-  #     GroupDescription: Security group for RDS
-  #     VpcId:
-  #       Fn::ImportValue: !Sub ${VPCStackName}::VpcId
-  #     SecurityGroupIngress:
-  #       - IpProtocol: tcp
-  #         FromPort: 5432
-  #         ToPort: 5432
-  #         SourceSecurityGroupId: !Ref SGDBAccess
-  #     Tags:
-  #       - Key: Name
-  #         Value: !Sub ${Environment}-SG-DB
-  #       - Key: Environment
-  #         Value: !Ref Environment
-  #       - Key: Group
-  #         Value: RDS
+  # Security Group for RDS
+  SGDB:
+    Type: AWS::EC2::SecurityGroup
+    DeletionPolicy: Retain
+    Properties:
+      GroupDescription: Security group for RDS
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 5432
+          ToPort: 5432
+          SourceSecurityGroupId: !Ref SGDBAccess
+      Tags:
+        - Key: Name
+          Value: SG-DB
+        - Key: TYPE
+          Value: DB
 
-  # # RDS Parameter Group
-  # DBParameterGroup:
-  #   Type: AWS::RDS::DBParameterGroup
-  #   DeletionPolicy: Retain
-  #   Properties:
-  #     Family: postgres16
-  #     Description: Custom parameter group for PostgreSQL
-  #     Parameters:
-  #       shared_preload_libraries: 'pg_stat_statements'
-  #       pg_stat_statements.track: 'all'
-  #     Tags:
-  #       - Key: Name
-  #         Value: !Sub ${Environment}-DB-Parameter-Group
-  #       - Key: Environment
-  #         Value: !Ref Environment
-  #       - Key: Group
-  #         Value: RDS
+  # RDS Parameter Group
+  DBParameterGroup:
+    Type: AWS::RDS::DBParameterGroup
+    DeletionPolicy: Retain
+    Properties:
+      Family: postgres17
+      Description: Custom parameter group for PostgreSQL
+      Parameters:
+        shared_preload_libraries: "pg_stat_statements"
+        pg_stat_statements.track: "all"
+      Tags:
+        - Key: Name
+          Value: !Sub DB-Parameter-Group
+        - Key: TYPE
+          Value: DB
 
-  # RDSInstance:
-  #   Type: AWS::RDS::DBInstance
-  #   DeletionPolicy: Retain
-  #   UpdateReplacePolicy: Retain
-  #   Properties:
-  #     DBSnapshotIdentifier: !If
-  #       - UseSnapshot
-  #       - !Ref DBSnapshotArn
-  #       - !Ref AWS::NoValue
-  #     DBName: !If
-  #       - UseSnapshot
-  #       - !Ref AWS::NoValue
-  #       - !Ref DBName
-  #     MasterUsername: !If
-  #       - UseSnapshot
-  #       - !Ref AWS::NoValue
-  #       - !Ref DBUsername
-  #     MasterUserPassword: !If
-  #       - UseSnapshot
-  #       - !Ref AWS::NoValue
-  #       - !Ref DBPassword
-  #     Engine: postgres
-  #     EngineVersion: '16.3'
-  #     DBInstanceClass: !Ref DBInstanceClass
-  #     AllocatedStorage: '20'
-  #     MaxAllocatedStorage: '100'
-  #     StorageType: gp3
-  #     MultiAZ: !If [ShouldCreateReplica, true, false]
-  #     PubliclyAccessible: false
-  #     DBSubnetGroupName: !Ref DBSubnetGroup
-  #     VPCSecurityGroups:
-  #       - !Ref SGDB
-  #     DBParameterGroupName: !Ref DBParameterGroup
-  #     BackupRetentionPeriod: !If [ShouldCreateReplica, 7, 1]
-  #     StorageEncrypted: true
-  #     KmsKeyId: !Sub "arn:aws:kms:${AWS::Region}:${AWS::AccountId}:alias/aws/rds"
-  #     Tags:
-  #       - Key: Name
-  #         Value: !Sub ${Environment}-PostgreSQL-Primary
-  #       - Key: Environment
-  #         Value: !Ref Environment
-  #       - Key: Group
-  #         Value: RDS
+  RDSInstance:
+    Type: AWS::RDS::DBInstance
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      DBName: database-prod
+      MasterUsername: postgres
+      MasterUserPassword: !Ref DBPassword
+      Engine: postgres
+      EngineVersion: "17.4"
+      DBInstanceClass: !Ref DBInstanceClass
+      # AllocatedStorage: '20'
+      # MaxAllocatedStorage: '100'
+      StorageType: gp3
+      MultiAZ: true
+      PubliclyAccessible: false
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      VPCSecurityGroups:
+        - !Ref SGDB
+      DBParameterGroupName: !Ref DBParameterGroup
+      StorageEncrypted: true
+      KmsKeyId: !Sub "arn:aws:kms:${AWS::Region}:${AWS::AccountId}:alias/aws/rds"
+      Tags:
+        - Key: Name
+          Value: PostgreSQL-Primary
+        - Key: CPU
+          Value: INTEL
+        - Key: TYPE
+          Value: DB
+        - Key: auto-delete
+          Value: no
 
 Outputs:
   #VPC
@@ -307,4 +297,26 @@ Outputs:
     Description: Private Subnet 2 ID
     Value: !Ref PrivateSubnet2
     Export:
-      Name: !Sub "${AWS::StackName}::PrivateSubnet2"
+      Name:
+        !Sub "${AWS::StackName}::PrivateSubnet2"
+
+        # Database
+  DBEndpoint:
+    Description: Database endpoint
+    Value: !GetAtt RDSInstance.Endpoint.Address
+    Export:
+      Name: !Sub ${AWS::StackName}::DBEndpoint
+
+  DBPort:
+    Description: Database port
+    Value: !GetAtt RDSInstance.Endpoint.Port
+
+  DBAccessSecurityGroup:
+    Description: Security Group ID for DB Access
+    Value: !Ref SGDBAccess
+    Export:
+      Name: !Sub ${AWS::StackName}::SGDBAccess
+
+  DBSecurityGroup:
+    Description: Security Group ID for DB
+    Value: !Ref SGDB
