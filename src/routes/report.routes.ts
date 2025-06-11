@@ -23,7 +23,7 @@ const router = Router();
 
 // S3 client setup - no credentials needed when using instance profile
 const s3Client = new S3Client({
-  region: process.env.AWS_REGION,
+  region: process.env.AWS_REGION || "us-east-1",
 });
 
 router.get("/", async (req: Request, res: Response) => {
@@ -41,7 +41,7 @@ router.get("/", async (req: Request, res: Response) => {
       const upload = new Upload({
         client: s3Client,
         params: {
-          Bucket: process.env.AWS_S3NAME,
+          Bucket: process.env.AWS_S3NAME || "gabo-tesis",
           Key: `sales-report-${Date.now()}.pdf`,
           Body: Readable.from(pdfData),
           ContentType: "application/pdf",
