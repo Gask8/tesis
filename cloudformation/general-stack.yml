@@ -250,8 +250,8 @@ Resources:
       Engine: postgres
       EngineVersion: "17.4"
       DBInstanceClass: !Ref DBInstanceClass
-      # AllocatedStorage: '20'
-      # MaxAllocatedStorage: '100'
+      AllocatedStorage: "20"
+      MaxAllocatedStorage: "100"
       StorageType: gp3
       MultiAZ: true
       PubliclyAccessible: false
