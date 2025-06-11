@@ -244,7 +244,7 @@ Resources:
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
-      DBName: database-prod
+      DBName: prod
       MasterUsername: postgres
       MasterUserPassword: !Ref DBPassword
       Engine: postgres
