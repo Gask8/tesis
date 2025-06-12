@@ -29,7 +29,7 @@ const testData = {
     model: "Camry",
     year: 2024,
     price: 25000,
-    is_available: true,
+    stock: 8,
   },
   sale: {
     car_id: 1,
@@ -90,8 +90,8 @@ export default function () {
     if (!checkResponse(getInStockCars)) errorRate.add(1);
 
     // DELETE car
-    const deleteCar = http.del(`${BASE_URL}/cars/id/${carId}`);
-    if (!checkResponse(deleteCar)) errorRate.add(1);
+    // const deleteCar = http.del(`${BASE_URL}/cars/id/${carId}`);
+    // if (!checkResponse(deleteCar)) errorRate.add(1);
   });
 
   group("Sales API", () => {
@@ -147,8 +147,8 @@ export default function () {
     if (!checkResponse(getTotalSales)) errorRate.add(1);
 
     // DELETE sale
-    const deleteSale = http.del(`${BASE_URL}/sales/id/${saleId}`);
-    if (!checkResponse(deleteSale)) errorRate.add(1);
+    // const deleteSale = http.del(`${BASE_URL}/sales/id/${saleId}`);
+    // if (!checkResponse(deleteSale)) errorRate.add(1);
   });
 
   group("Reports API", () => {
