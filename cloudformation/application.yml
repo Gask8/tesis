@@ -113,7 +113,7 @@ Resources:
           SourceSecurityGroupId: !Ref ALBSecurityGroup
       Tags:
         - Key: Name
-          Value: SG-APP
+          Value: !Sub SG-APP-${ProcesorType}
 
   # EC2 Instance
   EC2Instance:
@@ -216,7 +216,7 @@ Resources:
           CidrIp: 0.0.0.0/0
       Tags:
         - Key: Name
-          Value: SG-LB
+          Value: !Sub SG-LB-${ProcesorType}
 
   # Application Load Balancer
   ApplicationLoadBalancer:
