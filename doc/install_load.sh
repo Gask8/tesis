@@ -11,6 +11,22 @@ sudo apt-get install k6
 
 git clone https://github.com/gabsalk8/tesis.git
 
-#k6 run tesis/scripts/loadtest.js --out json=test1.json
+
+crontab -e
+# Low load testing (8,9,16,17)
+0 8 * * * cd /home/ubuntu && k6 run tesis/load_testing/loadtest-low.js --out json=logs/test$(date +\%Y\%m\%d_\%H\%M\%S)_low.json
+0 9 * * * cd /home/ubuntu && k6 run tesis/load_testing/loadtest-low.js --out json=logs/test$(date +\%Y\%m\%d_\%H\%M\%S)_low.json
+0 16 * * * cd /home/ubuntu && k6 run tesis/load_testing/loadtest-low.js --out json=logs/test$(date +\%Y\%m\%d_\%H\%M\%S)_low.json
+0 17 * * * cd /home/ubuntu && k6 run tesis/load_testing/loadtest-low.js --out json=logs/test$(date +\%Y\%m\%d_\%H\%M\%S)_low.json
+
+# Peak load testing (12,13)
+0 12 * * * cd /home/ubuntu && k6 run tesis/load_testing/loadtest-peak.js --out json=logs/test$(date +\%Y\%m\%d_\%H\%M\%S)_peak.json
+0 13 * * * cd /home/ubuntu && k6 run tesis/load_testing/loadtest-peak.js --out json=logs/test$(date +\%Y\%m\%d_\%H\%M\%S)_peak.json
+
+# Mid load testing (10,11,14,15)
+0 10 * * * cd /home/ubuntu && k6 run tesis/load_testing/loadtest-mid.js --out json=logs/test$(date +\%Y\%m\%d_\%H\%M\%S)_mid.json
+0 11 * * * cd /home/ubuntu && k6 run tesis/load_testing/loadtest-mid.js --out json=logs/test$(date +\%Y\%m\%d_\%H\%M\%S)_mid.json
+0 14 * * * cd /home/ubuntu && k6 run tesis/load_testing/loadtest-mid.js --out json=logs/test$(date +\%Y\%m\%d_\%H\%M\%S)_mid.json
+0 15 * * * cd /home/ubuntu && k6 run tesis/load_testing/loadtest-mid.js --out json=logs/test$(date +\%Y\%m\%d_\%H\%M\%S)_mid.json
 
 #https://medium.com/swlh/beginners-guide-to-load-testing-with-k6-85ec614d2f0d
