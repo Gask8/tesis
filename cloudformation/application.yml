@@ -15,6 +15,11 @@ Parameters:
     Type: String
     Description: Name of the VPC Stack to import values from
 
+  DBInstanceIdentifier:
+    Type: String
+    Description: RDS Instance Identifier to monitor
+    Default: vpc-rdsinstance-dvdpypt42rgk
+
 Resources:
   # IAM Role and Instance Profile
   EC2Role:
@@ -316,24 +321,24 @@ Resources:
                 "title": "EC2 Network In",
                 "period": 300
               }
+            },
+            {
+              "height": 6,
+              "width": 8,
+              "y": 6,
+              "x": 16,
+              "type": "metric",
+              "properties": {
+                "metrics": [
+                  [ "AWS/RDS", "CPUUtilization", "DBInstanceIdentifier", "${DBInstanceIdentifier}", { "stat": "Average" } ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "${AWS::Region}",
+                "title": "RDS CPU Utilization",
+                "period": 300
+              }
             }
-            # {
-            #   "height": 6,
-            #   "width": 8,
-            #   "y": 6,
-            #   "x": 16,
-            #   "type": "metric",
-            #   "properties": {
-            #     "metrics": [
-            #       [ "AWS/RDS", "CPUUtilization", "DBInstanceIdentifier", "${DBInstanceIdentifier}", { "stat": "Average" } ]
-            #     ],
-            #     "view": "timeSeries",
-            #     "stacked": false,
-            #     "region": "${AWS::Region}",
-            #     "title": "RDS CPU Utilization",
-            #     "period": 300
-            #   }
-            # }
           ]
         }
 
