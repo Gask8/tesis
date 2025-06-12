@@ -85,7 +85,7 @@ Resources:
                 Action:
                   - cloudwatch:PutMetricData
                   - ec2:DescribeVolumes
-                  - ec2:DescribeTag
+                  - ec2:DescribeTags
                   - logs:PutLogEvents
                   - logs:DescribeLogStreams
                   - logs:DescribeLogGroups
@@ -250,7 +250,7 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
       HealthCheckPath: /
-      Name: EC2TargetGroup
+      Name: !Sub EC2TargetGroup-${ProcesorType}
       Port: 80
       Protocol: HTTP
       TargetType: instance
