@@ -178,6 +178,8 @@ Resources:
       Tags:
         - Key: TYPE
           Value: VPC
+        - Key: auto-delete
+          Value: no
 
   # DB Subnet Group
   DBSubnetGroup:
@@ -271,6 +273,30 @@ Resources:
         - Key: auto-delete
           Value: no
 
+  RDSReadReplica:
+    Type: AWS::RDS::DBInstance
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      SourceDBInstanceIdentifier: !Ref RDSInstance
+      DBInstanceClass: db.m6g.large
+      Engine: postgres
+      PubliclyAccessible: false
+      VPCSecurityGroups:
+        - !Ref SGDB
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      StorageEncrypted: true
+      KmsKeyId: !Sub "arn:aws:kms:${AWS::Region}:${AWS::AccountId}:alias/aws/rds"
+      Tags:
+        - Key: Name
+          Value: PostgreSQL-ReadReplica
+        - Key: CPU
+          Value: ARM
+        - Key: TYPE
+          Value: DB
+        - Key: auto-delete
+          Value: no
+
 Outputs:
   #VPC
   VpcId:
@@ -311,12 +337,18 @@ Outputs:
     Description: Database port
     Value: !GetAtt RDSInstance.Endpoint.Port
 
+  ReadReplicaEndpoint:
+    Description: Read Replica endpoint
+    Value: !GetAtt RDSReadReplica.Endpoint.Address
+    Export:
+      Name: !Sub ${AWS::StackName}::ReadReplicaEndpoint
+
+  ReadReplicaPort:
+    Description: Read Replica port
+    Value: !GetAtt RDSReadReplica.Endpoint.Port
+
   DBAccessSecurityGroup:
     Description: Security Group ID for DB Access
     Value: !Ref SGDBAccess
     Export:
       Name: !Sub ${AWS::StackName}::SGDBAccess
-
-  DBSecurityGroup:
-    Description: Security Group ID for DB
-    Value: !Ref SGDB

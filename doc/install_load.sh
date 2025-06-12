@@ -11,4 +11,6 @@ sudo apt-get install k6
 
 git clone https://github.com/gabsalk8/tesis.git
 
+#k6 run tesis/scripts/loadtest.js --out json=test1.json
+
 #https://medium.com/swlh/beginners-guide-to-load-testing-with-k6-85ec614d2f0d

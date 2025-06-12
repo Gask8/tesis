@@ -2,13 +2,21 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: "EC2 Instance with Load Balancer"
 
 Parameters:
+  ProcesorType:
+    Type: String
+    Default: INTEL
+    AllowedValues:
+      - INTEL
+      - ARM
+    Description: EC2 instance type
+
   InstanceType:
     Type: String
     Default: t3.medium
     AllowedValues:
+      - t3.small
       - t3.medium
       - t3.large
-      - t3.xlarge
     Description: EC2 instance type
 
   VPCStackName:
@@ -35,7 +43,7 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
       Policies:
-        - PolicyName: S3AndSecretsManagerAccess
+        - PolicyName: S3AndSecretsManagerAccessAndCloudWatch
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
@@ -53,6 +61,17 @@ Resources:
                   - secretsmanager:GetSecretValue
                   - secretsmanager:DescribeSecret
                 Resource: arn:aws:secretsmanager:us-east-1:405894864706:secret:prod-PSZhOu
+              - Effect: Allow
+                Action:
+                  - cloudwatch:PutMetricData
+                  - ec2:DescribeVolumes
+                  - ec2:DescribeTag
+                  - logs:PutLogEvents
+                  - logs:DescribeLogStreams
+                  - logs:DescribeLogGroups
+                  - logs:CreateLogStream
+                  - logs:CreateLogGroup
+                Resource: "*"
 
   EC2InstanceProfile:
     Type: AWS::IAM::InstanceProfile
@@ -101,6 +120,7 @@ Resources:
         Fn::Base64: !Sub |
           #!/bin/bash
           apt update -y
+          apt upgrade -y
           apt install git -y
 
           # Create ubuntu user if it doesn't exist and set up environment
@@ -234,7 +254,7 @@ Resources:
                 "stacked": false,
                 "region": "${AWS::Region}",
                 "title": "ALB Target Response Time",
-                "period": 300
+                "period": 60
               }
             },
             {
@@ -251,7 +271,7 @@ Resources:
                 "stacked": false,
                 "region": "${AWS::Region}",
                 "title": "ALB Request Count",
-                "period": 300
+                "period": 60
               }
             },
             {
@@ -268,7 +288,7 @@ Resources:
                 "stacked": false,
                 "region": "${AWS::Region}",
                 "title": "Target 5XX Errors",
-                "period": 300
+                "period": 60
               }
             },
             {
@@ -285,7 +305,7 @@ Resources:
                 "stacked": false,
                 "region": "${AWS::Region}",
                 "title": "Target 2XX Success",
-                "period": 300
+                "period": 60
               }
             },
             {
@@ -302,7 +322,7 @@ Resources:
                 "stacked": false,
                 "region": "${AWS::Region}",
                 "title": "EC2 CPU Utilization",
-                "period": 300
+                "period": 60
               }
             },
             {
@@ -319,7 +339,7 @@ Resources:
                 "stacked": false,
                 "region": "${AWS::Region}",
                 "title": "EC2 Network In",
-                "period": 300
+                "period": 60
               }
             },
             {
@@ -336,7 +356,7 @@ Resources:
                 "stacked": false,
                 "region": "${AWS::Region}",
                 "title": "RDS CPU Utilization",
-                "period": 300
+                "period": 60
               }
             }
           ]
