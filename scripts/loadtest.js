@@ -3,7 +3,8 @@ import { check, sleep, group } from "k6";
 import { Rate } from "k6/metrics";
 
 const errorRate = new Rate("errors");
-const BASE_URL = "http://localhost:3000/api";
+const BASE_URL =
+  "http://app-applicat-jtyg0gxlc4sm-1650034821.us-east-1.elb.amazonaws.com/api";
 
 export const options = {
   stages: [
