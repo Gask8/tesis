@@ -126,7 +126,7 @@ Resources:
       ImageId: !If
         - IsIntelProcessor
         - ami-0c7217cdde317cfec # Ubuntu 22.04 LTS for x86
-        - ami-0080974613cf1e8c7 # Ubuntu 22.04 LTS for ARM
+        - ami-07041441b708acbd6 # Ubuntu 22.04 LTS for ARM
       IamInstanceProfile: !Ref EC2InstanceProfile
       SubnetId:
         Fn::ImportValue: !Sub ${VPCStackName}::PrivateSubnet1
@@ -281,23 +281,7 @@ Resources:
                 "stacked": false,
                 "region": "${AWS::Region}",
                 "title": "ALB Target Response Time",
-                "period": 60
-              }
-            },
-            {
-              "height": 3,
-              "width": 6,
-              "y": 6,
-              "x": 0,
-              "type": "metric",
-              "properties": {
-                "metrics": [
-                  [ "AWS/ApplicationELB", "TargetResponseTime", "LoadBalancer", "${ApplicationLoadBalancer.LoadBalancerFullName}", { "stat": "Average" } ]
-                ],
-                "view": "table",
-                "region": "${AWS::Region}",
-                "title": "ALB Response Time Data",
-                "period": 60
+                "period": 100
               }
             },
             {
@@ -314,23 +298,7 @@ Resources:
                 "stacked": false,
                 "region": "${AWS::Region}",
                 "title": "ALB Request Count",
-                "period": 60
-              }
-            },
-            {
-              "height": 3,
-              "width": 6,
-              "y": 6,
-              "x": 6,
-              "type": "metric",
-              "properties": {
-                "metrics": [
-                  [ "AWS/ApplicationELB", "RequestCount", "LoadBalancer", "${ApplicationLoadBalancer.LoadBalancerFullName}", { "stat": "Sum" } ]
-                ],
-                "view": "table",
-                "region": "${AWS::Region}",
-                "title": "ALB Request Count Data",
-                "period": 60
+                "period": 100
               }
             },
             {
@@ -347,23 +315,7 @@ Resources:
                 "stacked": false,
                 "region": "${AWS::Region}",
                 "title": "Target 5XX Errors",
-                "period": 60
-              }
-            },
-            {
-              "height": 3,
-              "width": 6,
-              "y": 6,
-              "x": 12,
-              "type": "metric",
-              "properties": {
-                "metrics": [
-                  [ "AWS/ApplicationELB", "HTTPCode_Target_5XX_Count", "LoadBalancer", "${ApplicationLoadBalancer.LoadBalancerFullName}", { "stat": "Sum" } ]
-                ],
-                "view": "table",
-                "region": "${AWS::Region}",
-                "title": "5XX Errors Data",
-                "period": 60
+                "period": 100
               }
             },
             {
@@ -380,29 +332,13 @@ Resources:
                 "stacked": false,
                 "region": "${AWS::Region}",
                 "title": "Target 2XX Success",
-                "period": 60
-              }
-            },
-            {
-              "height": 3,
-              "width": 6,
-              "y": 6,
-              "x": 18,
-              "type": "metric",
-              "properties": {
-                "metrics": [
-                  [ "AWS/ApplicationELB", "HTTPCode_Target_2XX_Count", "LoadBalancer", "${ApplicationLoadBalancer.LoadBalancerFullName}", { "stat": "Sum" } ]
-                ],
-                "view": "table",
-                "region": "${AWS::Region}",
-                "title": "2XX Success Data",
-                "period": 60
+                "period": 100
               }
             },
             {
               "height": 6,
               "width": 8,
-              "y": 9,
+              "y": 6,
               "x": 0,
               "type": "metric",
               "properties": {
@@ -413,29 +349,13 @@ Resources:
                 "stacked": false,
                 "region": "${AWS::Region}",
                 "title": "EC2 CPU Utilization",
-                "period": 60
-              }
-            },
-            {
-              "height": 3,
-              "width": 8,
-              "y": 15,
-              "x": 0,
-              "type": "metric",
-              "properties": {
-                "metrics": [
-                  [ "AWS/EC2", "CPUUtilization", "InstanceId", "${EC2Instance}", { "stat": "Average" } ]
-                ],
-                "view": "table",
-                "region": "${AWS::Region}",
-                "title": "EC2 CPU Data",
-                "period": 60
+                "period": 100
               }
             },
             {
               "height": 6,
               "width": 8,
-              "y": 9,
+              "y": 6,
               "x": 8,
               "type": "metric",
               "properties": {
@@ -446,29 +366,13 @@ Resources:
                 "stacked": false,
                 "region": "${AWS::Region}",
                 "title": "EC2 Network In",
-                "period": 60
-              }
-            },
-            {
-              "height": 3,
-              "width": 8,
-              "y": 15,
-              "x": 8,
-              "type": "metric",
-              "properties": {
-                "metrics": [
-                  [ "AWS/EC2", "NetworkIn", "InstanceId", "${EC2Instance}", { "stat": "Average" } ]
-                ],
-                "view": "table",
-                "region": "${AWS::Region}",
-                "title": "Network In Data",
-                "period": 60
+                "period": 100
               }
             },
             {
               "height": 6,
               "width": 8,
-              "y": 9,
+              "y": 6,
               "x": 16,
               "type": "metric",
               "properties": {
@@ -479,13 +383,127 @@ Resources:
                 "stacked": false,
                 "region": "${AWS::Region}",
                 "title": "RDS CPU Utilization",
-                "period": 60
+                "period": 100
+              }
+            },
+            {
+              "height": 6,
+              "width": 6,
+              "y": 12,
+              "x": 0,
+              "type": "metric",
+              "properties": {
+                "metrics": [
+                  [ "AWS/ApplicationELB", "TargetResponseTime", "LoadBalancer", "${ApplicationLoadBalancer.LoadBalancerFullName}", { "stat": "Average" } ]
+                ],
+                "view": "table",
+                "region": "${AWS::Region}",
+                "title": "ALB Response Time Data",
+                "period": 900,
+                "table": {
+                    "layout": "vertical"
+                }
+              }
+            },
+            {
+              "height": 6,
+              "width": 6,
+              "y": 12,
+              "x": 6,
+              "type": "metric",
+              "properties": {
+                "metrics": [
+                  [ "AWS/ApplicationELB", "RequestCount", "LoadBalancer", "${ApplicationLoadBalancer.LoadBalancerFullName}", { "stat": "Sum" } ]
+                ],
+                "view": "table",
+                "region": "${AWS::Region}",
+                "title": "ALB Request Count Data",
+                "period": 900,
+                "table": {
+                    "layout": "vertical"
+                }
+              }
+            },
+            {
+              "height": 6,
+              "width": 6,
+              "y": 12,
+              "x": 12,
+              "type": "metric",
+              "properties": {
+                "metrics": [
+                  [ "AWS/ApplicationELB", "HTTPCode_Target_5XX_Count", "LoadBalancer", "${ApplicationLoadBalancer.LoadBalancerFullName}", { "stat": "Sum" } ]
+                ],
+                "view": "table",
+                "region": "${AWS::Region}",
+                "title": "5XX Errors Data",
+                "period": 900,
+                "table": {
+                    "layout": "vertical"
+                }
+              }
+            },
+            {
+              "height": 6,
+              "width": 6,
+              "y": 12,
+              "x": 18,
+              "type": "metric",
+              "properties": {
+                "metrics": [
+                  [ "AWS/ApplicationELB", "HTTPCode_Target_2XX_Count", "LoadBalancer", "${ApplicationLoadBalancer.LoadBalancerFullName}", { "stat": "Sum" } ]
+                ],
+                "view": "table",
+                "region": "${AWS::Region}",
+                "title": "2XX Success Data",
+                "period": 900,
+                "table": {
+                    "layout": "vertical"
+                }
+              }
+            },
+            {
+              "height": 6,
+              "width": 8,
+              "y": 18,
+              "x": 0,
+              "type": "metric",
+              "properties": {
+                "metrics": [
+                  [ "AWS/EC2", "CPUUtilization", "InstanceId", "${EC2Instance}", { "stat": "Average" } ]
+                ],
+                "view": "table",
+                "region": "${AWS::Region}",
+                "title": "EC2 CPU Data",
+                "period": 900,
+                "table": {
+                    "layout": "vertical"
+                }
               }
             },
             {
               "height": 3,
               "width": 8,
-              "y": 15,
+              "y": 18,
+              "x": 8,
+              "type": "metric",
+              "properties": {
+                "metrics": [
+                  [ "AWS/EC2", "NetworkIn", "InstanceId", "${EC2Instance}", { "stat": "Average" } ]
+                ],
+                "view": "table",
+                "region": "${AWS::Region}",
+                "title": "Network In Data",
+                "period": 900,
+                "table": {
+                    "layout": "vertical"
+                }
+              }
+            },
+            {
+              "height": 6,
+              "width": 8,
+              "y": 18,
               "x": 16,
               "type": "metric",
               "properties": {
@@ -495,7 +513,10 @@ Resources:
                 "view": "table",
                 "region": "${AWS::Region}",
                 "title": "RDS CPU Data",
-                "period": 60
+                "period": 900,
+                "table": {
+                    "layout": "vertical"
+                }
               }
             }
           ]
