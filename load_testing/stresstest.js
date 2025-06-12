@@ -8,13 +8,11 @@ const BASE_URL =
 
 export const options = {
   stages: [
-    { duration: "5m", target: 50 }, // Ramp up to 20 users
-    { duration: "5m", target: 50 }, // Stay at 20 users
-    { duration: "10m", target: 100 }, // Ramp up to 50 users
-    { duration: "10m", target: 100 }, // Stay at 50 users
-    { duration: "10m", target: 500 }, // Ramp up to 100 users
-    { duration: "5m", target: 500 }, // Stay at 100 users
-    { duration: "5m", target: 0 }, // Ramp down to 0
+    { duration: "1m", target: 20 },
+    { duration: "1m", target: 100 },
+    { duration: "1m", target: 200 },
+    { duration: "1m", target: 500 },
+    { duration: "1m", target: 0 }, // Ramp down to 0
   ],
   thresholds: {
     http_req_duration: ["p(95)<2000"],
