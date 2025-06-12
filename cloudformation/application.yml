@@ -153,17 +153,6 @@ Resources:
           # Create ubuntu user if it doesn't exist and set up environment
           useradd -m -s /bin/bash ubuntu || true
 
-          # Execute commands as ubuntu user
-          su - ubuntu << 'EOF'
-          # NVM installation and Node setup
-          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
-          export NVM_DIR="$HOME/.nvm"
-          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-          nvm install 22
-          node -v
-          npm -v
-          EOF
-
           # Continue with system-level installations
           apt install nginx -y
           systemctl start nginx
@@ -194,6 +183,15 @@ Resources:
           # Clone and set up application as ubuntu user
           su - ubuntu << 'EOF'
           cd $HOME
+
+          # NVM installation and Node setup
+          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+          export NVM_DIR="$HOME/.nvm"
+          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+          nvm install 22
+          node -v
+          npm -v
+
           git clone https://github.com/gabsalk8/tesis.git
           cd tesis
           npm install -g pm2
@@ -365,7 +363,7 @@ Resources:
                 "view": "timeSeries",
                 "stacked": false,
                 "region": "${AWS::Region}",
-                "title": "EC2 Network In",
+                "title": "EC2 Mem Utilization",
                 "period": 120
               }
             },
@@ -493,7 +491,7 @@ Resources:
                 ],
                 "view": "table",
                 "region": "${AWS::Region}",
-                "title": "Network In Data",
+                "title": "EC2 Mem Utilization",
                 "period": 900,
                 "table": {
                     "layout": "vertical"

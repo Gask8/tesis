@@ -1,7 +1,6 @@
 import http from "k6/http";
 import { check, sleep, group } from "k6";
 import { Rate } from "k6/metrics";
-import { random } from "k6/utils";
 
 const errorRate = new Rate("errors");
 const BASE_URL =
@@ -11,10 +10,10 @@ export const options = {
   stages: [
     { duration: "1m", target: 20 }, // Ramp up to 20 users
     { duration: "2m", target: 20 }, // Stay at 20 users
-    // { duration: "1m", target: 50 }, // Ramp up to 50 users
-    // { duration: "2m", target: 50 }, // Stay at 50 users
-    // { duration: "1m", target: 100 }, // Ramp up to 100 users
-    // { duration: "2m", target: 100 }, // Stay at 100 users
+    { duration: "1m", target: 50 }, // Ramp up to 50 users
+    { duration: "2m", target: 50 }, // Stay at 50 users
+    { duration: "1m", target: 100 }, // Ramp up to 100 users
+    { duration: "2m", target: 100 }, // Stay at 100 users
     { duration: "1m", target: 0 }, // Ramp down to 0
   ],
   thresholds: {
@@ -71,7 +70,7 @@ function shouldExecuteRequest(probability) {
 
 function checkResponse(response, expectedStatus = 200) {
   return check(response, {
-    // [`status is ${expectedStatus}`]: (r) => r.status == expectedStatus,
+    "status is 200 or 201": (r) => r.status == expectedStatus,
     "response time < 2000ms": (r) => r.timings.duration < 2000,
   });
 }
@@ -140,7 +139,7 @@ export default function () {
     }
 
     if (shouldExecuteRequest(REQUEST_PROBABILITIES.getSaleById)) {
-      const saleId = 1;
+      const saleId = 2;
       const getSaleById = http.get(`${BASE_URL}/sales/id/${saleId}`);
       if (!checkResponse(getSaleById)) errorRate.add(1);
     }
