@@ -144,8 +144,9 @@ Resources:
           cd $HOME
           git clone https://github.com/gabsalk8/tesis.git
           cd tesis
-          npm install
           npm install -g pm2
+          npm install -g typescript
+          npm install
           ./scripts/startweb.sh
           EOF
 
@@ -206,7 +207,141 @@ Resources:
       VpcId:
         Fn::ImportValue: !Sub ${VPCStackName}::VpcId
 
+  # CloudWatch Dashboard
+  ApplicationDashboard:
+    Type: AWS::CloudWatch::Dashboard
+    Properties:
+      DashboardName: !Sub ${AWS::StackName}-Dashboard
+      DashboardBody: !Sub |
+        {
+          "widgets": [
+            {
+              "height": 6,
+              "width": 6,
+              "y": 0,
+              "x": 0,
+              "type": "metric",
+              "properties": {
+                "metrics": [
+                  [ "AWS/ApplicationELB", "TargetResponseTime", "LoadBalancer", "${ApplicationLoadBalancer.LoadBalancerFullName}", { "stat": "Average" } ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "${AWS::Region}",
+                "title": "ALB Target Response Time",
+                "period": 300
+              }
+            },
+            {
+              "height": 6,
+              "width": 6,
+              "y": 0,
+              "x": 6,
+              "type": "metric",
+              "properties": {
+                "metrics": [
+                  [ "AWS/ApplicationELB", "RequestCount", "LoadBalancer", "${ApplicationLoadBalancer.LoadBalancerFullName}", { "stat": "Sum" } ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "${AWS::Region}",
+                "title": "ALB Request Count",
+                "period": 300
+              }
+            },
+            {
+              "height": 6,
+              "width": 6,
+              "y": 0,
+              "x": 12,
+              "type": "metric",
+              "properties": {
+                "metrics": [
+                  [ "AWS/ApplicationELB", "HTTPCode_Target_5XX_Count", "LoadBalancer", "${ApplicationLoadBalancer.LoadBalancerFullName}", { "stat": "Sum" } ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "${AWS::Region}",
+                "title": "Target 5XX Errors",
+                "period": 300
+              }
+            },
+            {
+              "height": 6,
+              "width": 6,
+              "y": 0,
+              "x": 18,
+              "type": "metric",
+              "properties": {
+                "metrics": [
+                  [ "AWS/ApplicationELB", "HTTPCode_Target_2XX_Count", "LoadBalancer", "${ApplicationLoadBalancer.LoadBalancerFullName}", { "stat": "Sum" } ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "${AWS::Region}",
+                "title": "Target 2XX Success",
+                "period": 300
+              }
+            },
+            {
+              "height": 6,
+              "width": 8,
+              "y": 6,
+              "x": 0,
+              "type": "metric",
+              "properties": {
+                "metrics": [
+                  [ "AWS/EC2", "CPUUtilization", "InstanceId", "${EC2Instance}", { "stat": "Average" } ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "${AWS::Region}",
+                "title": "EC2 CPU Utilization",
+                "period": 300
+              }
+            },
+            {
+              "height": 6,
+              "width": 8,
+              "y": 6,
+              "x": 8,
+              "type": "metric",
+              "properties": {
+                "metrics": [
+                  [ "AWS/EC2", "NetworkIn", "InstanceId", "${EC2Instance}", { "stat": "Average" } ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "${AWS::Region}",
+                "title": "EC2 Network In",
+                "period": 300
+              }
+            }
+            # {
+            #   "height": 6,
+            #   "width": 8,
+            #   "y": 6,
+            #   "x": 16,
+            #   "type": "metric",
+            #   "properties": {
+            #     "metrics": [
+            #       [ "AWS/RDS", "CPUUtilization", "DBInstanceIdentifier", "${DBInstanceIdentifier}", { "stat": "Average" } ]
+            #     ],
+            #     "view": "timeSeries",
+            #     "stacked": false,
+            #     "region": "${AWS::Region}",
+            #     "title": "RDS CPU Utilization",
+            #     "period": 300
+            #   }
+            # }
+          ]
+        }
+
 Outputs:
   LoadBalancerDNS:
     Description: DNS name of the load balancer
     Value: !GetAtt ApplicationLoadBalancer.DNSName
+
+  DashboardURL:
+    Description: URL of the created dashboard
+    Value: !Sub https://${AWS::Region}.console.aws.amazon.com/cloudwatch/home?region=${AWS::Region}#dashboards:name=ApplicationDashboard
