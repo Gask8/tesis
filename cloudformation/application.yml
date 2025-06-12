@@ -281,7 +281,7 @@ Resources:
                 "stacked": false,
                 "region": "${AWS::Region}",
                 "title": "ALB Target Response Time",
-                "period": 100
+                "period": 120
               }
             },
             {
@@ -298,7 +298,7 @@ Resources:
                 "stacked": false,
                 "region": "${AWS::Region}",
                 "title": "ALB Request Count",
-                "period": 100
+                "period": 120
               }
             },
             {
@@ -315,7 +315,7 @@ Resources:
                 "stacked": false,
                 "region": "${AWS::Region}",
                 "title": "Target 5XX Errors",
-                "period": 100
+                "period": 120
               }
             },
             {
@@ -332,7 +332,7 @@ Resources:
                 "stacked": false,
                 "region": "${AWS::Region}",
                 "title": "Target 2XX Success",
-                "period": 100
+                "period": 120
               }
             },
             {
@@ -349,7 +349,7 @@ Resources:
                 "stacked": false,
                 "region": "${AWS::Region}",
                 "title": "EC2 CPU Utilization",
-                "period": 100
+                "period": 120
               }
             },
             {
@@ -366,7 +366,7 @@ Resources:
                 "stacked": false,
                 "region": "${AWS::Region}",
                 "title": "EC2 Network In",
-                "period": 100
+                "period": 120
               }
             },
             {
@@ -383,7 +383,7 @@ Resources:
                 "stacked": false,
                 "region": "${AWS::Region}",
                 "title": "RDS CPU Utilization",
-                "period": 100
+                "period": 120
               }
             },
             {
