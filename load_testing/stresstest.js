@@ -4,6 +4,7 @@ import { Rate } from "k6/metrics";
 
 const errorRate = new Rate("errors");
 const BASE_URL =
+  __ENV.BASE_URL ||
   "http://intela-appli-slu18y1s7ajr-1557949211.us-east-1.elb.amazonaws.com/api";
 
 export const options = {
