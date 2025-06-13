@@ -10,20 +10,20 @@ useradd -m -s /bin/bash ubuntu || true
 # Create a temporary file with the crontab entries
 cat << 'EOF' > /tmp/crontab_entries
 # Low load testing (8,9,16,17)
-0 14 * * * cd /home/ubuntu && k6 run tesis/load_testing/loadtest-low.js --out json=logs/test$(date +\%Y\%m\%d_\%H\%M\%S)_low.json
-0 15 * * * cd /home/ubuntu && k6 run tesis/load_testing/loadtest-low.js --out json=logs/test$(date +\%Y\%m\%d_\%H\%M\%S)_low.json
-0 22 * * * cd /home/ubuntu && k6 run tesis/load_testing/loadtest-low.js --out json=logs/test$(date +\%Y\%m\%d_\%H\%M\%S)_low.json
-0 23 * * * cd /home/ubuntu && k6 run tesis/load_testing/loadtest-low.js --out json=logs/test$(date +\%Y\%m\%d_\%H\%M\%S)_low.json
+0 14 * * * cd /home/ubuntu && k6 run tesis/load_testing/loadtest-low.js -e BASE_URL=http://your-new-url.com/api --out json=logs/test$(date +\%Y\%m\%d_\%H\%M\%S)_low.json
+0 15 * * * cd /home/ubuntu && k6 run tesis/load_testing/loadtest-low.js -e BASE_URL=http://your-new-url.com/api --out json=logs/test$(date +\%Y\%m\%d_\%H\%M\%S)_low.json
+0 22 * * * cd /home/ubuntu && k6 run tesis/load_testing/loadtest-low.js -e BASE_URL=http://your-new-url.com/api --out json=logs/test$(date +\%Y\%m\%d_\%H\%M\%S)_low.json
+0 23 * * * cd /home/ubuntu && k6 run tesis/load_testing/loadtest-low.js -e BASE_URL=http://your-new-url.com/api --out json=logs/test$(date +\%Y\%m\%d_\%H\%M\%S)_low.json
 
 # Peak load testing (12,13)
-0 18 * * * cd /home/ubuntu && k6 run tesis/load_testing/loadtest-peak.js --out json=logs/test$(date +\%Y\%m\%d_\%H\%M\%S)_peak.json
-0 19 * * * cd /home/ubuntu && k6 run tesis/load_testing/loadtest-peak.js --out json=logs/test$(date +\%Y\%m\%d_\%H\%M\%S)_peak.json
+0 18 * * * cd /home/ubuntu && k6 run tesis/load_testing/loadtest-peak.js -e BASE_URL=http://your-new-url.com/api --out json=logs/test$(date +\%Y\%m\%d_\%H\%M\%S)_peak.json
+0 19 * * * cd /home/ubuntu && k6 run tesis/load_testing/loadtest-peak.js -e BASE_URL=http://your-new-url.com/api --out json=logs/test$(date +\%Y\%m\%d_\%H\%M\%S)_peak.json
 
 # Mid load testing (10,11,14,15)
-0 16 * * * cd /home/ubuntu && k6 run tesis/load_testing/loadtest-mid.js --out json=logs/test$(date +\%Y\%m\%d_\%H\%M\%S)_mid.json
-0 17 * * * cd /home/ubuntu && k6 run tesis/load_testing/loadtest-mid.js --out json=logs/test$(date +\%Y\%m\%d_\%H\%M\%S)_mid.json
-0 20 * * * cd /home/ubuntu && k6 run tesis/load_testing/loadtest-mid.js --out json=logs/test$(date +\%Y\%m\%d_\%H\%M\%S)_mid.json
-0 21 * * * cd /home/ubuntu && k6 run tesis/load_testing/loadtest-mid.js --out json=logs/test$(date +\%Y\%m\%d_\%H\%M\%S)_mid.json
+0 16 * * * cd /home/ubuntu && k6 run tesis/load_testing/loadtest-mid.js -e BASE_URL=http://your-new-url.com/api --out json=logs/test$(date +\%Y\%m\%d_\%H\%M\%S)_mid.json
+0 17 * * * cd /home/ubuntu && k6 run tesis/load_testing/loadtest-mid.js -e BASE_URL=http://your-new-url.com/api --out json=logs/test$(date +\%Y\%m\%d_\%H\%M\%S)_mid.json
+0 20 * * * cd /home/ubuntu && k6 run tesis/load_testing/loadtest-mid.js -e BASE_URL=http://your-new-url.com/api --out json=logs/test$(date +\%Y\%m\%d_\%H\%M\%S)_mid.json
+0 21 * * * cd /home/ubuntu && k6 run tesis/load_testing/loadtest-mid.js -e BASE_URL=http://your-new-url.com/api --out json=logs/test$(date +\%Y\%m\%d_\%H\%M\%S)_mid.json
 EOF
 
 crontab -u ubuntu /tmp/crontab_entries
