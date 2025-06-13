@@ -546,11 +546,6 @@ Resources:
           Arn: arn:aws:iam::405894864706:instance-profile/ssmConnection2
         SecurityGroupIds:
           - !Ref K6SecurityGroup
-        NetworkInterfaces:
-          - AssociatePublicIpAddress: true
-            DeviceIndex: 0
-            Groups:
-              - !Ref K6SecurityGroup
         TagSpecifications:
           - ResourceType: instance
             Tags:
@@ -603,7 +598,7 @@ Resources:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
       VPCZoneIdentifier:
-        - Fn::ImportValue: !Sub ${VPCStackName}::PublicSubnet1
+        - Fn::ImportValue: !Sub ${VPCStackName}::PrivateSubnet2
       LaunchTemplate:
         LaunchTemplateId: !Ref K6LaunchTemplate
         Version: !GetAtt K6LaunchTemplate.LatestVersionNumber
