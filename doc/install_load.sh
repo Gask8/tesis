@@ -1,7 +1,6 @@
 #https://grafana.com/docs/k6/latest/set-up/install-k6/
 
 #!/bin/bash
-
 apt update -y
 apt upgrade -y
 apt install git -y
@@ -30,16 +29,16 @@ EOF
 crontab -u ubuntu /tmp/crontab_entries
 rm /tmp/crontab_entries
 
-su - ubuntu
+su - ubuntu << 'EOF'
 cd $HOME
-
+git clone https://github.com/gabsalk8/tesis.git
+mkdir logs
 sudo gpg -k
 sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
 sudo echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
 sudo apt-get update
 sudo apt-get install k6
-
-git clone https://github.com/gabsalk8/tesis.git
+EOF
 
 
 # crontab -e
