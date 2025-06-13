@@ -22,7 +22,6 @@ COPY package*.json ./
 RUN npm install --only=production
 # Copy built assets from builder stage
 COPY --from=builder /app/dist ./dist
-COPY .env .env
 
 # Expose port
 EXPOSE 3000

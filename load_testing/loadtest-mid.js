@@ -4,6 +4,7 @@ import { Rate } from "k6/metrics";
 
 const errorRate = new Rate("errors");
 const BASE_URL =
+  __ENV.BASE_URL ||
   "http://intela-appli-slu18y1s7ajr-1557949211.us-east-1.elb.amazonaws.com/api";
 
 export const options = {
@@ -50,17 +51,17 @@ const REQUEST_PROBABILITIES = {
   getInStockCars: 0.15, // 15%
 
   // Sales API
-  getAllSales: 0.1, // 10%
+  getAllSales: 0.15, // 15%
   createSale: 0.05, // 5%
-  getSaleById: 0.05, // 5%
-  updateSale: 0.03, // 3%
-  getSalesByCarId: 0.03, // 3%
-  getSalesByCustomer: 0.02, // 2%
-  getSalesByDateRange: 0.01, // 1%
-  getTotalSales: 0.05, // 5%
+  getSaleById: 0.2, // 20%
+  updateSale: 0.05, // 5%
+  getSalesByCarId: 0.08, // 8%
+  getSalesByCustomer: 0.15, // 15%
+  getSalesByDateRange: 0.08, // 8%
+  getTotalSales: 0.1, // 10%
 
   // Reports API
-  generateReport: 0.01, // 1%
+  generateReport: 0.05, // 5%
 };
 
 // Helper function to determine if a request should be executed
