@@ -552,9 +552,9 @@ Resources:
               - Key: auto-delete
                 Value: "no"
               - Key: Name
-                Value: k6
+                Value: !Sub k6-${ProcesorType}
         UserData:
-          Fn::Base64: |
+          Fn::Base64: !Sub |
             #!/bin/bash
             apt update -y
             apt upgrade -y
@@ -607,7 +607,7 @@ Resources:
       DesiredCapacity: !Ref K6Quantity
       Tags:
         - Key: Name
-          Value: k6
+          Value: !Sub k6-${ProcesorType}
           PropagateAtLaunch: true
         - Key: auto-delete
           Value: "no"
