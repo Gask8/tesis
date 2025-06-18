@@ -44,7 +44,7 @@ Conditions:
 
 Mappings:
   InstanceTypeMap:
-    small:
+    micro:
       INTEL: t3.micro
       ARM: t4g.micro
     small:
@@ -124,22 +124,21 @@ Resources:
         - Key: Name
           Value: !Sub SG-APP-${ProcesorType}
 
-    ApplicationSecret:
+  ApplicationSecret:
     Type: AWS::SecretsManager::Secret
     Properties:
       Name: !Sub secrets-${ProcesorType}-${VPCStackName}
-      Description: 'Secret for application database and AWS configuration'
-      SecretString: 
-        !Sub |
-          {
-            "DB_HOST": "",
-            "DB_PORT": "5432",
-            "DB_NAME": "postgres",
-            "DB_USER": "postgres",
-            "DB_PASSWORD": "",
-            "AWS_REGION": "us-east-1",
-            "AWS_S3NAME": "gabo-tesis"
-          }
+      Description: "Secret for application database and AWS configuration"
+      SecretString: !Sub |
+        {
+          "DB_HOST": "",
+          "DB_PORT": "5432",
+          "DB_NAME": "postgres",
+          "DB_USER": "postgres",
+          "DB_PASSWORD": "",
+          "AWS_REGION": "us-east-1",
+          "AWS_S3NAME": "gabo-tesis"
+        }
       Tags:
         - Key: Environment
           Value: !Ref ProcesorType
