@@ -251,7 +251,7 @@ Resources:
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
-      DBName: prod
+      DBName: prod1
       MasterUsername: postgres
       MasterUserPassword: !Ref DBPassword
       Engine: postgres
@@ -283,25 +283,34 @@ Resources:
         - Key: auto-delete
           Value: no
 
-  RDSReadReplica:
+  RDSInstanceOther:
     Type: AWS::RDS::DBInstance
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
-      SourceDBInstanceIdentifier: !Ref RDSInstance
+      DBName: prod2
+      MasterUsername: postgres
+      MasterUserPassword: !Ref DBPassword
+      Engine: postgres
+      EngineVersion: "17.4"
       DBInstanceClass: !If
         - IsGraviton
         - db.m6i.large
         - db.m6g.large
-      Engine: postgres
+      AllocatedStorage: "20"
+      MaxAllocatedStorage: "100"
+      StorageType: gp3
+      MultiAZ: true
       PubliclyAccessible: false
+      DBSubnetGroupName: !Ref DBSubnetGroup
       VPCSecurityGroups:
         - !Ref SGDB
+      DBParameterGroupName: !Ref DBParameterGroup
       StorageEncrypted: true
       KmsKeyId: !Sub "arn:aws:kms:${AWS::Region}:${AWS::AccountId}:alias/aws/rds"
       Tags:
         - Key: Name
-          Value: PostgreSQL-ReadReplica
+          Value: PostgreSQL-Secundary
         - Key: CPU
           Value: !If
             - IsGraviton
@@ -311,6 +320,35 @@ Resources:
           Value: DB
         - Key: auto-delete
           Value: no
+
+  # RDSReadReplica:
+  #   Type: AWS::RDS::DBInstance
+  #   DeletionPolicy: Retain
+  #   UpdateReplacePolicy: Retain
+  #   Properties:
+  #     SourceDBInstanceIdentifier: !Ref RDSInstance
+  #     DBInstanceClass: !If
+  #       - IsGraviton
+  #       - db.m6i.large
+  #       - db.m6g.large
+  #     Engine: postgres
+  #     PubliclyAccessible: false
+  #     VPCSecurityGroups:
+  #       - !Ref SGDB
+  #     StorageEncrypted: true
+  #     KmsKeyId: !Sub "arn:aws:kms:${AWS::Region}:${AWS::AccountId}:alias/aws/rds"
+  #     Tags:
+  #       - Key: Name
+  #         Value: PostgreSQL-ReadReplica
+  #       - Key: CPU
+  #         Value: !If
+  #           - IsGraviton
+  #           - INTEL
+  #           - ARM
+  #       - Key: TYPE
+  #         Value: DB
+  #       - Key: auto-delete
+  #         Value: no
 
 Outputs:
   #VPC
@@ -348,19 +386,21 @@ Outputs:
     Export:
       Name: !Sub ${AWS::StackName}::DBEndpoint
 
+  DBEndpointOther:
+    Description: Database endpoint
+    Value: !GetAtt RDSInstanceOther.Endpoint.Address
+    Export:
+      Name: !Sub ${AWS::StackName}::DBEndpoint
+
   DBPort:
     Description: Database port
     Value: !GetAtt RDSInstance.Endpoint.Port
 
-  ReadReplicaEndpoint:
-    Description: Read Replica endpoint
-    Value: !GetAtt RDSReadReplica.Endpoint.Address
-    Export:
-      Name: !Sub ${AWS::StackName}::ReadReplicaEndpoint
-
-  ReadReplicaPort:
-    Description: Read Replica port
-    Value: !GetAtt RDSReadReplica.Endpoint.Port
+  # ReadReplicaEndpoint:
+  #   Description: Read Replica endpoint
+  #   Value: !GetAtt RDSReadReplica.Endpoint.Address
+  #   Export:
+  #     Name: !Sub ${AWS::StackName}::ReadReplicaEndpoint
 
   DBAccessSecurityGroup:
     Description: Security Group ID for DB Access

@@ -4,7 +4,7 @@ import {
   GetSecretValueCommand,
 } from "@aws-sdk/client-secrets-manager";
 
-const secret_name = "prod";
+const secret_name = process.env.SECRET_NAME || "prod";
 const client = new SecretsManagerClient({
   region: "us-east-1",
 });
