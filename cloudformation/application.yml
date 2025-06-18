@@ -89,7 +89,7 @@ Resources:
                 Action:
                   - secretsmanager:GetSecretValue
                   - secretsmanager:DescribeSecret
-                Resource: arn:aws:secretsmanager:us-east-1:405894864706:secret:prod-PSZhOu
+                Resource: !Ref ApplicationSecret
               - Effect: Allow
                 Action:
                   - cloudwatch:PutMetricData
@@ -146,6 +146,7 @@ Resources:
   # EC2 Instance
   EC2Instance:
     Type: AWS::EC2::Instance
+    DependsOn: ApplicationSecret
     Properties:
       InstanceType: !FindInMap
         - InstanceTypeMap
@@ -222,7 +223,7 @@ Resources:
 
           git clone https://github.com/gabsalk8/tesis.git
           cd tesis
-          echo "SECRET_NAME=${ApplicationSecret.Name}" > .env
+          echo "SECRET_NAME=secrets-${ProcesorType}-${VPCStackName}" > .env
           npm install -g pm2
           npm install -g typescript
           npm install
