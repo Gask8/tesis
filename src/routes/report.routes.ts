@@ -42,7 +42,7 @@ router.get("/", async (req: Request, res: Response) => {
         client: s3Client,
         params: {
           Bucket: process.env.AWS_S3NAME || "gabo-tesis",
-          Key: `sales-report-${Date.now()}.pdf`,
+          Key: `reports/sales-report-${Date.now()}.pdf`,
           Body: Readable.from(pdfData),
           ContentType: "application/pdf",
         },
@@ -53,7 +53,7 @@ router.get("/", async (req: Request, res: Response) => {
         res.json({
           message: "Report generated and uploaded successfully",
           location: result.Location,
-          key: `sales-report-${Date.now()}.pdf`,
+          key: `reports/sales-report-${Date.now()}.pdf`,
         });
       } catch (err) {
         console.error("Error uploading to S3", err);

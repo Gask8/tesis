@@ -390,7 +390,7 @@ Outputs:
     Description: Database endpoint
     Value: !GetAtt RDSInstanceOther.Endpoint.Address
     Export:
-      Name: !Sub ${AWS::StackName}::DBEndpoint
+      Name: !Sub ${AWS::StackName}::DBEndpointOther
 
   DBPort:
     Description: Database port
