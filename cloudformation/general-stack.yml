@@ -62,7 +62,7 @@ Resources:
     Properties:
       VpcId: !Ref VPC
       CidrBlock: "10.0.2.0/24"
-      AvailabilityZone: !Select [1, !GetAZs ""]
+      AvailabilityZone: "us-east-2b"
       Tags:
         - Key: TYPE
           Value: VPC
@@ -83,7 +83,7 @@ Resources:
     Properties:
       VpcId: !Ref VPC
       CidrBlock: "10.0.4.0/24"
-      AvailabilityZone: !Select [1, !GetAZs ""]
+      AvailabilityZone: "us-east-2b"
       Tags:
         - Key: TYPE
           Value: VPC
