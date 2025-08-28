@@ -10,6 +10,7 @@ export class SaleModel {
         FROM sales s 
         JOIN cars c ON s.car_id = c.id 
         ORDER BY s.id
+        LIMIT 300
       `);
       return result.rows;
     } catch (error) {
@@ -158,7 +159,8 @@ export class SaleModel {
         `SELECT s.*, c.make, c.model 
          FROM sales s 
          JOIN cars c ON s.car_id = c.id 
-         WHERE s.customer_name ILIKE $1`,
+         WHERE s.customer_name ILIKE $1
+         LIMIT 100`,
         [`%${customerName}%`]
       );
       return result.rows;
@@ -179,7 +181,8 @@ export class SaleModel {
          FROM sales s 
          JOIN cars c ON s.car_id = c.id 
          WHERE s.sale_date BETWEEN $1 AND $2
-         ORDER BY s.sale_date`,
+         ORDER BY s.sale_date
+         LIMIT 100`,
         [startDate, endDate]
       );
       return result.rows;

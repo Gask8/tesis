@@ -590,7 +590,7 @@ Resources:
             # Create a temporary file with the crontab entries
             cat << 'EOF' > /tmp/crontab_entries
             # load testing (8-17)
-            0 14-23 * * *  cd /home/ubuntu && k6 run tesis/load_testing/loadtest.js -e BASE_URL=http://${ApplicationLoadBalancer.DNSName}/api --out json=logs/test$(date +\%Y\%m\%d_\%H\%M\%S).json
+            0 6 * * *  cd /home/ubuntu && k6 run tesis/load_testing/loadtest.js -e BASE_URL=http://${ApplicationLoadBalancer.DNSName}/api --out json=logs/test$(date +\%Y\%m\%d_\%H\%M\%S).json
             EOF
             crontab -u ubuntu /tmp/crontab_entries
             rm /tmp/crontab_entries
@@ -626,37 +626,34 @@ Resources:
           Value: "no"
           PropagateAtLaunch: true
 
-  # Schedule for 2 minimum instances at 16:00 and 17:00
-  ScaleUpTo2At16:
-    Type: AWS::AutoScaling::ScheduledAction
-    Properties:
-      AutoScalingGroupName: !Ref K6AutoScalingGroup
-      MinSize: 2
-      Recurrence: "45 15 * * *"
-
-  # Schedule for 3 minimum instances at 18:00 and 19:00
-  ScaleUpTo3At18:
-    Type: AWS::AutoScaling::ScheduledAction
-    Properties:
-      AutoScalingGroupName: !Ref K6AutoScalingGroup
-      MinSize: 3
-      Recurrence: "45 17 * * *"
-
-  # Schedule back to 2 minimum instances at 20:00 and 21:00
-  ScaleBackTo2At20:
-    Type: AWS::AutoScaling::ScheduledAction
-    Properties:
-      AutoScalingGroupName: !Ref K6AutoScalingGroup
-      MinSize: 2
-      Recurrence: "45 19 * * *"
-
-  # Scale down to 1 instance at other times (e.g., 22:00)
-  ScaleDownTo1At22:
-    Type: AWS::AutoScaling::ScheduledAction
-    Properties:
-      AutoScalingGroupName: !Ref K6AutoScalingGroup
-      MinSize: 1
-      Recurrence: "0 22 * * *"
+  # # Schedule for 2 minimum instances at 16:00 and 17:00
+  # ScaleUpTo2At16:
+  #   Type: AWS::AutoScaling::ScheduledAction
+  #   Properties:
+  #     AutoScalingGroupName: !Ref K6AutoScalingGroup
+  #     MinSize: 2
+  #     Recurrence: "45 15 * * *"
+  # # Schedule for 3 minimum instances at 18:00 and 19:00
+  # ScaleUpTo3At18:
+  #   Type: AWS::AutoScaling::ScheduledAction
+  #   Properties:
+  #     AutoScalingGroupName: !Ref K6AutoScalingGroup
+  #     MinSize: 3
+  #     Recurrence: "45 17 * * *"
+  # # Schedule back to 2 minimum instances at 20:00 and 21:00
+  # ScaleBackTo2At20:
+  #   Type: AWS::AutoScaling::ScheduledAction
+  #   Properties:
+  #     AutoScalingGroupName: !Ref K6AutoScalingGroup
+  #     MinSize: 2
+  #     Recurrence: "45 19 * * *"
+  # # Scale down to 1 instance at other times (e.g., 22:00)
+  # ScaleDownTo1At22:
+  #   Type: AWS::AutoScaling::ScheduledAction
+  #   Properties:
+  #     AutoScalingGroupName: !Ref K6AutoScalingGroup
+  #     MinSize: 1
+  #     Recurrence: "0 22 * * *"
 
 Outputs:
   LoadBalancerDNS:

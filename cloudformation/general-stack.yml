@@ -9,10 +9,10 @@ Parameters:
 
   DBInstanceClass:
     Type: String
-    Default: db.m6i.large
+    Default: db.t4g.micro
     AllowedValues:
-      - db.m6g.large
-      - db.m6i.large
+      - db.t4g.micro
+      - db.t3.micro
     Description: Database instance class
 
 Conditions:
@@ -295,8 +295,8 @@ Resources:
       EngineVersion: "17.4"
       DBInstanceClass: !If
         - IsGraviton
-        - db.m6i.large
-        - db.m6g.large
+        - db.t3.micro
+        - db.t4g.micro
       AllocatedStorage: "20"
       MaxAllocatedStorage: "100"
       StorageType: gp3

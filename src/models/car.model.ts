@@ -5,7 +5,7 @@ export class CarModel {
   // Get all cars
   static async findAll(): Promise<Car[]> {
     try {
-      const result = await query("SELECT * FROM cars ORDER BY id");
+      const result = await query("SELECT * FROM cars ORDER BY id LIMIT 100");
       return result.rows;
     } catch (error) {
       throw new Error(`Error fetching cars: ${error}`);
@@ -78,9 +78,10 @@ export class CarModel {
   // Custom methods
   static async findByMake(make: string): Promise<Car[]> {
     try {
-      const result = await query("SELECT * FROM cars WHERE make ILIKE $1", [
-        `%${make}%`,
-      ]);
+      const result = await query(
+        "SELECT * FROM cars WHERE make ILIKE $1 LIMIT 100",
+        [`%${make}%`]
+      );
       return result.rows;
     } catch (error) {
       throw new Error(`Error fetching cars by make ${make}: ${error}`);
@@ -89,7 +90,9 @@ export class CarModel {
 
   static async findInStockCars(): Promise<Car[]> {
     try {
-      const result = await query("SELECT * FROM cars WHERE stock > 0");
+      const result = await query(
+        "SELECT * FROM cars WHERE stock > 0 LIMIT 100"
+      );
       return result.rows;
     } catch (error) {
       throw new Error(`Error fetching in-stock cars: ${error}`);
