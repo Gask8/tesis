@@ -18,7 +18,7 @@ Parameters:
 Conditions:
   IsGraviton: !Equals
     - !Ref DBInstanceClass
-    - db.m6g.large
+    - db.t4g.micro
 
 Resources:
   # VPC

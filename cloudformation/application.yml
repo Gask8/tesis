@@ -136,7 +136,7 @@ Resources:
           "DB_NAME": "postgres",
           "DB_USER": "postgres",
           "DB_PASSWORD": "",
-          "AWS_REGION": "us-east-1",
+          "AWS_REGION": "us-east-2",
           "AWS_S3NAME": "gabo-tesis2"
         }
       Tags:

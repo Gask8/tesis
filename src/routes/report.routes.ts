@@ -23,7 +23,7 @@ const router = Router();
 
 // S3 client setup - no credentials needed when using instance profile
 const s3Client = new S3Client({
-  region: process.env.AWS_REGION || "us-east-1",
+  region: process.env.AWS_REGION || "us-east-2",
 });
 
 router.get("/", async (req: Request, res: Response) => {

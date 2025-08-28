@@ -6,7 +6,7 @@ import {
 
 const secret_name = process.env.SECRET_NAME || "prod";
 const client = new SecretsManagerClient({
-  region: "us-east-1",
+  region: "us-east-2",
 });
 
 async function createPool() {
