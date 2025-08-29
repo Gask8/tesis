@@ -7,18 +7,15 @@ Parameters:
     Description: Database admin password
     NoEcho: true
 
-  DBInstanceClass:
+  DBInstanceIntelClass:
+    Type: String
+    Default: db.t3.micro
+    Description: Database Intel instance class
+
+  DBInstanceArmClass:
     Type: String
     Default: db.t4g.micro
-    AllowedValues:
-      - db.t4g.micro
-      - db.t3.micro
     Description: Database instance class
-
-Conditions:
-  IsGraviton: !Equals
-    - !Ref DBInstanceClass
-    - db.t4g.micro
 
 Resources:
   # VPC
@@ -246,7 +243,7 @@ Resources:
         - Key: TYPE
           Value: DB
 
-  RDSInstance:
+  RDSInstanceIntel:
     Type: AWS::RDS::DBInstance
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
@@ -256,7 +253,7 @@ Resources:
       MasterUserPassword: !Ref DBPassword
       Engine: postgres
       EngineVersion: "17.4"
-      DBInstanceClass: !Ref DBInstanceClass
+      DBInstanceClass: !Ref DBInstanceIntelClass
       AllocatedStorage: "20"
       MaxAllocatedStorage: "100"
       StorageType: gp3
@@ -273,17 +270,12 @@ Resources:
           Value: PostgreSQL-Primary
         - Key: CPU
           Value: INTEL
-        - Key: CPU
-          Value: !If
-            - IsGraviton
-            - ARM
-            - INTEL
         - Key: TYPE
           Value: DB
         - Key: auto-delete
           Value: no
 
-  RDSInstanceOther:
+  RDSInstanceArm:
     Type: AWS::RDS::DBInstance
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
@@ -293,10 +285,7 @@ Resources:
       MasterUserPassword: !Ref DBPassword
       Engine: postgres
       EngineVersion: "17.4"
-      DBInstanceClass: !If
-        - IsGraviton
-        - db.t3.micro
-        - db.t4g.micro
+      DBInstanceClass: !Ref DBInstanceArmClass
       AllocatedStorage: "20"
       MaxAllocatedStorage: "100"
       StorageType: gp3
@@ -312,10 +301,7 @@ Resources:
         - Key: Name
           Value: PostgreSQL-Secundary
         - Key: CPU
-          Value: !If
-            - IsGraviton
-            - INTEL
-            - ARM
+          Value: ARM
         - Key: TYPE
           Value: DB
         - Key: auto-delete
@@ -380,21 +366,21 @@ Outputs:
         !Sub "${AWS::StackName}::PrivateSubnet2"
 
         # Database
-  DBEndpoint:
+  DBEndpointIntel:
     Description: Database endpoint
-    Value: !GetAtt RDSInstance.Endpoint.Address
+    Value: !GetAtt RDSInstanceIntel.Endpoint.Address
     Export:
-      Name: !Sub ${AWS::StackName}::DBEndpoint
+      Name: !Sub ${AWS::StackName}::DBEndpointIntel
 
-  DBEndpointOther:
+  DBEndpointArm:
     Description: Database endpoint
-    Value: !GetAtt RDSInstanceOther.Endpoint.Address
+    Value: !GetAtt RDSInstanceArm.Endpoint.Address
     Export:
-      Name: !Sub ${AWS::StackName}::DBEndpointOther
+      Name: !Sub ${AWS::StackName}::DBEndpointArm
 
   DBPort:
     Description: Database port
-    Value: !GetAtt RDSInstance.Endpoint.Port
+    Value: !GetAtt RDSInstanceIntel.Endpoint.Port
 
   # ReadReplicaEndpoint:
   #   Description: Read Replica endpoint

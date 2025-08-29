@@ -10,7 +10,7 @@ const BASE_URL =
 
 export const options = {
   vus: 1,
-  duration: "24h",
+  duration: "23h",
   thresholds: {
     http_req_duration: ["p(95)<2000"],
     errors: ["rate<0.1"],

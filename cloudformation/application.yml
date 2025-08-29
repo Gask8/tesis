@@ -29,6 +29,11 @@ Parameters:
     Description: RDS Instance Identifier to monitor
     Default: vpc-rdsinstance-dvdpypt42rgk
 
+  DBPassword:
+    Type: String
+    Description: Database admin password
+    NoEcho: true
+
   K6Quantity:
     Type: Number
     Default: 1
@@ -130,15 +135,21 @@ Resources:
       Name: !Sub secrets-${ProcesorType}-${VPCStackName}
       Description: "Secret for application database and AWS configuration"
       SecretString: !Sub |
-        {
-          "DB_HOST": "",
-          "DB_PORT": "5432",
-          "DB_NAME": "postgres",
-          "DB_USER": "postgres",
-          "DB_PASSWORD": "",
-          "AWS_REGION": "us-east-2",
-          "AWS_S3NAME": "gabo-tesis2"
-        }
+        - |
+          {
+            "DB_HOST": "${DBHost}",
+            "DB_PORT": "5432",
+            "DB_NAME": "postgres",
+            "DB_USER": "postgres",
+            "DB_PASSWORD": "${DBPassword}",
+            "AWS_REGION": "us-east-2",
+            "AWS_S3NAME": "gabo-tesis2"
+          }
+        - DBHost: !If 
+            - IsIntel
+            - !ImportValue !Sub "${VPCStackName}-IntelEndpoint"
+            - !ImportValue !Sub "${VPCStackName}-ArmEndpoint"
+          DBPassword: !Ref DBPassword
       Tags:
         - Key: Environment
           Value: !Ref ProcesorType
@@ -154,8 +165,8 @@ Resources:
         - !Ref ProcesorType
       ImageId: !If
         - IsIntelProcessor
-        - ami-0c7217cdde317cfec # Ubuntu 22.04 LTS for x86
-        - ami-07041441b708acbd6 # Ubuntu 22.04 LTS for ARM
+        - ami-0d9a665f802ae6227 # Ubuntu 22.04 LTS for x86
+        - ami-05b580e994a808c42 # Ubuntu 22.04 LTS for ARM
       IamInstanceProfile: !Ref EC2InstanceProfile
       SubnetId:
         Fn::ImportValue: !Sub ${VPCStackName}::PrivateSubnet1
@@ -561,70 +572,68 @@ Resources:
           Value: !Sub ${AWS::StackName}-k6-SG
 
   # Launch Template
-  K6LaunchTemplate:
-    Type: AWS::EC2::LaunchTemplate
+  K6Instance:
+    Type: AWS::EC2::Instance
     Properties:
-      LaunchTemplateData:
-        ImageId: ami-020cba7c55df1f615
-        InstanceType: t3.micro
-        IamInstanceProfile:
-          Arn: arn:aws:iam::405894864706:instance-profile/ssmConnection2
-        SecurityGroupIds:
-          - !Ref K6SecurityGroup
-        TagSpecifications:
-          - ResourceType: instance
-            Tags:
-              - Key: auto-delete
-                Value: "no"
-              - Key: Name
-                Value: !Sub k6-${ProcesorType}
-        UserData:
-          Fn::Base64: !Sub |
-            #!/bin/bash
-            apt update -y
-            apt upgrade -y
-            apt install git -y
-
-            useradd -m -s /bin/bash ubuntu || true
-
-            # Create a temporary file with the crontab entries
-            cat << 'EOF' > /tmp/crontab_entries
-            # load testing (8-17)
-            0 6 * * *  cd /home/ubuntu && k6 run tesis/load_testing/loadtest.js -e BASE_URL=http://${ApplicationLoadBalancer.DNSName}/api --out json=logs/test$(date +\%Y\%m\%d_\%H\%M\%S).json
-            EOF
-            crontab -u ubuntu /tmp/crontab_entries
-            rm /tmp/crontab_entries
-
-            su - ubuntu << 'EOF'
-            cd $HOME
-            mkdir logs
-            git clone https://github.com/Gask8/tesis.git
-            sudo gpg -k
-            sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
-            sudo echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
-            sudo apt-get update
-            sudo apt-get install k6
-            EOF
-
-  # Auto Scaling Group
-  K6AutoScalingGroup:
-    Type: AWS::AutoScaling::AutoScalingGroup
-    Properties:
-      VPCZoneIdentifier:
-        - Fn::ImportValue: !Sub ${VPCStackName}::PrivateSubnet2
-      LaunchTemplate:
-        LaunchTemplateId: !Ref K6LaunchTemplate
-        Version: !GetAtt K6LaunchTemplate.LatestVersionNumber
-      MinSize: !Ref K6Quantity
-      MaxSize: 10
-      DesiredCapacity: !Ref K6Quantity
+      InstanceType: t3.micro # you can parameterize this if you want
+      ImageId: ami-0d9a665f802ae6227 # Ubuntu 22.04 LTS for x86
+      IamInstanceProfile: !Ref EC2InstanceProfile
+      SubnetId:
+        Fn::ImportValue: !Sub ${VPCStackName}::PrivateSubnet2
+      SecurityGroupIds:
+        - !Ref K6SecurityGroup
       Tags:
-        - Key: Name
-          Value: !Sub k6-${ProcesorType}
-          PropagateAtLaunch: true
         - Key: auto-delete
           Value: "no"
-          PropagateAtLaunch: true
+        - Key: Name
+          Value: !Sub k6-${ProcesorType}
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          apt update -y
+          apt upgrade -y
+          apt install git -y
+
+          useradd -m -s /bin/bash ubuntu || true
+
+          # Create a temporary file with the crontab entries
+          cat << 'EOF' > /tmp/crontab_entries
+          # load testing (8-17)
+          0 6 * * *  cd /home/ubuntu && k6 run tesis/load_testing/loadtest.js -e BASE_URL=http://${ApplicationLoadBalancer.DNSName}/api --out json=logs/test$(date +\%Y\%m\%d_\%H\%M\%S).json
+          EOF
+          crontab -u ubuntu /tmp/crontab_entries
+          rm /tmp/crontab_entries
+
+          su - ubuntu << 'EOF'
+          cd $HOME
+          mkdir logs
+          git clone https://github.com/Gask8/tesis.git
+          sudo gpg -k
+          sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+          sudo echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install k6
+          EOF
+
+  # Auto Scaling Group
+  # K6AutoScalingGroup:
+  #   Type: AWS::AutoScaling::AutoScalingGroup
+  #   Properties:
+  #     VPCZoneIdentifier:
+  #       - Fn::ImportValue: !Sub ${VPCStackName}::PrivateSubnet2
+  #     LaunchTemplate:
+  #       LaunchTemplateId: !Ref K6LaunchTemplate
+  #       Version: !GetAtt K6LaunchTemplate.LatestVersionNumber
+  #     MinSize: !Ref K6Quantity
+  #     MaxSize: 10
+  #     DesiredCapacity: !Ref K6Quantity
+  #     Tags:
+  #       - Key: Name
+  #         Value: !Sub k6-${ProcesorType}
+  #         PropagateAtLaunch: true
+  #       - Key: auto-delete
+  #         Value: "no"
+  #         PropagateAtLaunch: true
 
   # # Schedule for 2 minimum instances at 16:00 and 17:00
   # ScaleUpTo2At16:
@@ -664,6 +673,6 @@ Outputs:
     Description: URL of the created dashboard
     Value: !Sub https://${AWS::Region}.console.aws.amazon.com/cloudwatch/home?region=${AWS::Region}#dashboards:name=ApplicationDashboard
 
-  AutoScalingGroupName:
-    Description: Name of the Auto Scaling Group
-    Value: !Ref K6AutoScalingGroup
+  # AutoScalingGroupName:
+  #   Description: Name of the Auto Scaling Group
+  #   Value: !Ref K6AutoScalingGroup
