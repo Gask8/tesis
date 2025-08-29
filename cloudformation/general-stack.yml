@@ -17,6 +17,10 @@ Parameters:
     Default: db.t4g.micro
     Description: Database instance class
 
+  S3BucketName:
+    Type: String
+    Description: Name of the S3 bucket for the application
+
 Resources:
   # VPC
   VPC:
@@ -307,6 +311,21 @@ Resources:
         - Key: auto-delete
           Value: no
 
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref S3BucketName
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+      Tags:
+        - Key: TYPE
+          Value: S3
+
   # RDSReadReplica:
   #   Type: AWS::RDS::DBInstance
   #   DeletionPolicy: Retain
@@ -393,3 +412,9 @@ Outputs:
     Value: !Ref SGDBAccess
     Export:
       Name: !Sub ${AWS::StackName}::SGDBAccess
+
+  S3BucketName:
+    Description: Application S3 bucket name
+    Value: !Ref S3BucketName
+    Export:
+      Name: !Sub S3BucketName-${AWS::StackName}

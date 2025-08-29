@@ -62,6 +62,9 @@ Mappings:
       INTEL: t3.large
       ARM: t4g.large
 
+Metadata:
+  ImportedBucket: !ImportValue S3BucketName-!Ref VPCStackName
+
 Resources:
   # IAM Role and Instance Profile
   EC2Role:
@@ -88,8 +91,8 @@ Resources:
                   - s3:GetObject
                   - s3:ListBucket
                 Resource:
-                  - arn:aws:s3:::gabo-tesis2
-                  - arn:aws:s3:::gabo-tesis2/*
+                  - !Sub arn:aws:s3:::${ImportedBucket}
+                  - !Sub arn:aws:s3:::${ImportedBucket}/*
               - Effect: Allow
                 Action:
                   - secretsmanager:GetSecretValue
@@ -235,6 +238,7 @@ Resources:
           git clone https://github.com/Gask8/tesis.git
           cd tesis
           echo "SECRET_NAME=secrets-${ProcesorType}-${VPCStackName}" > .env
+          echo "AWS_S3NAME=${ImportedBucket}" >> .env
           npm install -g pm2
           npm install -g typescript
           npm install
