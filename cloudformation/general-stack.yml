@@ -21,6 +21,10 @@ Parameters:
     Type: String
     Description: Name of the S3 bucket for the application
 
+  KeyPair:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Name of an existing EC2 KeyPair (optional if using SSM only)
+
 Resources:
   # VPC
   VPC:
@@ -326,6 +330,67 @@ Resources:
         - Key: TYPE
           Value: S3
 
+  # Security Group
+  InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow minimal inbound traffic
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+
+  # IAM Role for SSM
+  EC2SSMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+
+  # Instance Profile for EC2
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref EC2SSMRole
+
+  # EC2 Instance
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t3.micro
+      KeyName: !Ref KeyPair
+      IamInstanceProfile: !Ref EC2InstanceProfile
+      ImageId: ami-0d9a665f802ae6227
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: false
+          DeviceIndex: 0
+          SubnetId: !Ref PublicSubnet1
+          GroupSet:
+            - !Ref InstanceSecurityGroup
+      Tags:
+        - Key: Name
+          Value: SSM-Managed-Instance
+
+  # Elastic IP
+  ElasticIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      InstanceId: !Ref EC2Instance
+
   # RDSReadReplica:
   #   Type: AWS::RDS::DBInstance
   #   DeletionPolicy: Retain
@@ -418,3 +483,17 @@ Outputs:
     Value: !Ref S3BucketName
     Export:
       Name: !Sub S3BucketName-${AWS::StackName}
+
+  InstanceId:
+    Description: Instance ID
+    Value: !Ref EC2Instance
+
+  ElasticIPAddress:
+    Description: Elastic IP assigned to the instance
+    Value: !Ref ElasticIP
+
+  InstanceSecurityGroup:
+    Description: Security Group ID for the bastion/EC2 instance
+    Value: !Ref InstanceSecurityGroup
+    Export:
+      Name: !Sub "${AWS::StackName}::InstanceSecurityGroup"

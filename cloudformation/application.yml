@@ -39,6 +39,10 @@ Parameters:
     Default: 1
     Description: How many load testins instances are
 
+  KeyPair:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Name of an existing EC2 KeyPair (optional if using SSM only)
+
 Conditions:
   IsIntelProcessor: !Equals
     - !Ref ProcesorType
@@ -128,6 +132,11 @@ Resources:
           FromPort: 80
           ToPort: 80
           SourceSecurityGroupId: !Ref ALBSecurityGroup
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          SourceSecurityGroupId:
+            Fn::ImportValue: !Sub ${VPCStackName}::InstanceSecurityGroup
       Tags:
         - Key: Name
           Value: !Sub SG-APP-${ProcesorType}
@@ -171,6 +180,7 @@ Resources:
         - ami-0d9a665f802ae6227 # Ubuntu 22.04 LTS for x86
         - ami-05b580e994a808c42 # Ubuntu 22.04 LTS for ARM
       IamInstanceProfile: !Ref EC2InstanceProfile
+      KeyName: !Ref KeyPair
       SubnetId:
         Fn::ImportValue: !Sub ${VPCStackName}::PrivateSubnet1
       SecurityGroupIds:
@@ -240,7 +250,7 @@ Resources:
           echo "SECRET_NAME=secrets-${ProcesorType}-${VPCStackName}" > .env
           echo "AWS_S3NAME=${ImportedBucket}" >> .env
           npm install -g pm2
-          npm install -g typescript
+          npm install -g typescript.
           npm install
           ./scripts/startweb.sh
           EOF
@@ -569,6 +579,12 @@ Resources:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Security group for K6 load testing with no inbound rules
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          SourceSecurityGroupId:
+            Fn::ImportValue: !Sub ${VPCStackName}::InstanceSecurityGroup
       VpcId:
         Fn::ImportValue: !Sub ${VPCStackName}::VpcId
       Tags:
@@ -582,6 +598,7 @@ Resources:
       InstanceType: t3.micro # you can parameterize this if you want
       ImageId: ami-0d9a665f802ae6227 # Ubuntu 22.04 LTS for x86
       IamInstanceProfile: !Ref EC2InstanceProfile
+      KeyName: !Ref KeyPair
       SubnetId:
         Fn::ImportValue: !Sub ${VPCStackName}::PrivateSubnet2
       SecurityGroupIds:
