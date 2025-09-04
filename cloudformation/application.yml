@@ -155,7 +155,7 @@ Resources:
             "DB_USER": "postgres",
             "DB_PASSWORD": "${DBPassword}",
             "AWS_REGION": "us-east-2",
-            "AWS_S3NAME": "gabo-tesis2"
+            "AWS_S3NAME": "gabotesis3"
           }
         - DBHost: !If 
             - IsIntel
