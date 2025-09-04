@@ -95,8 +95,8 @@ Resources:
                   - s3:GetObject
                   - s3:ListBucket
                 Resource:
-                  - !Sub arn:aws:s3:::${ImportedBucket}
-                  - !Sub arn:aws:s3:::${ImportedBucket}/*
+                  - arn:aws:s3:::gabobuckettesis123
+                  - arn:aws:s3:::gabobuckettesis123/*
               - Effect: Allow
                 Action:
                   - secretsmanager:GetSecretValue
@@ -155,7 +155,7 @@ Resources:
             "DB_USER": "postgres",
             "DB_PASSWORD": "${DBPassword}",
             "AWS_REGION": "us-east-2",
-            "AWS_S3NAME": "gabotesis3"
+            "AWS_S3NAME": "gabobuckettesis123"
           }
         - DBHost: !If 
             - IsIntel

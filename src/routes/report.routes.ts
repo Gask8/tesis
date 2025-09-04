@@ -41,7 +41,7 @@ router.get("/", async (req: Request, res: Response) => {
       const upload = new Upload({
         client: s3Client,
         params: {
-          Bucket: process.env.AWS_S3NAME || "gabotesis3",
+          Bucket: process.env.AWS_S3NAME || "gabobuckettesis123",
           Key: `reports/sales-report-${Date.now()}.pdf`,
           Body: Readable.from(pdfData),
           ContentType: "application/pdf",
